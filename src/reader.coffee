@@ -9,7 +9,7 @@ typeClasses = {Map, List, Vector, Set, Discard, Tag, Tagged, StringObj}
 parens = '()[]{}'
 specialChars = parens + ' \t\n\r,'
 escapeChar = '\\'
-parenTypes = 
+parenTypes =
 	'(' : closing: ')', class: "List"
 	'[' : closing: ']', class: "Vector"
 	'{' : closing: '}', class: "Map"
@@ -28,20 +28,20 @@ lex = (string) ->
 
 		if not in_string? and c is ";" and not escaping?
 			in_comment = true
-			
+
 		if in_comment
 			if c is "\n"
 				in_comment = undefined
-				if token 
+				if token
 					list.push token
-					lines.push line 
+					lines.push line
 					token = ''
 			continue
-			
+
 		if c is '"' and not escaping?
 			if in_string?
 				list.push (new StringObj in_string)
-				lines.push line 
+				lines.push line
 				in_string = undefined
 			else
 				in_string = ''
@@ -52,26 +52,26 @@ lex = (string) ->
 				escaping = true
 				continue
 
-			if escaping? 
+			if escaping?
 				escaping = undefined
-				if c in ["t", "n", "f", "r"] 
+				if c in ["t", "n", "f", "r"]
 					in_string += escapeChar
 
 			in_string += c
 		else if specialChars.indexOf(c) >= 0 and not escaping?
 			if token
 				list.push token
-				lines.push line 
+				lines.push line
 				token = ''
 			if parens.indexOf(c) >= 0
 				list.push c
-				lines.push line 
+				lines.push line
 		else
 			if escaping
 				escaping = undefined
 			else if c is escapeChar
 				escaping = true
-			
+
 			if token is "#_"
 				list.push token
 				lines.push line
@@ -80,7 +80,7 @@ lex = (string) ->
 
 	if token
 		list.push(token)
-		lines.push line 
+		lines.push line
 	{tokens: list, tokenLines: lines}
 
 #based roughly on the work of norvig from his lisp in python
@@ -101,10 +101,10 @@ read = (ast) ->
 				tokenIndex++
 				if token is paren.closing
 					return new typeClasses[if expectSet then "Set" else paren.class] L
-				else 
+				else
 					L.push read_ahead token, tokenIndex
 
-		else if ")]}".indexOf(token) >= 0
+		else if ")]}".indexOf(token) >= 0 and not token == ""
 			throw "unexpected #{token} at line #{tokenLines[tokenIndex]}"
 		else
 			handledToken = handleToken token
@@ -121,38 +121,38 @@ read = (ast) ->
 						return tagged.obj()
 					else
 						throw "Exepected a set but did not get one at line #{tokenLines[tokenIndex]}"
-					
+
 				if tagged.tag().dn() is "_"
 					return new typeClasses.Discard
-				
+
 				if tagActions[tagged.tag().dn()]?
 					return tagActions[tagged.tag().dn()].action tagged.obj()
-				
+
 				return tagged
 			else
 				return handledToken
 
 	token1 = tokens.shift()
 	if token1 is undefined
-		return undefined 
+		return undefined
 	else
 		result = read_ahead token1
-		if result instanceof typeClasses.Discard 
+		if result instanceof typeClasses.Discard
 			return ""
 		return result
-		
-parse = (string) -> read lex string 
 
-module.exports = 
+parse = (string) -> read lex string
+
+module.exports =
 	Char: Char
 	char: char
 	Iterable: Iterable
 	Symbol: Symbol
-	sym: sym	
+	sym: sym
 	Keyword: Keyword
 	kw: kw
 	BigInt: BigInt
-	bigInt: bigInt 
+	bigInt: bigInt
 	List: List
 	Vector: Vector
 	Pair: Pair
@@ -161,11 +161,11 @@ module.exports =
 	Tag: Tag
 	Tagged: Tagged
 
-	setTypeClass: (typeName, klass) -> 
+	setTypeClass: (typeName, klass) ->
 		if typeClasses[typeName]?
-			module.exports[typeName] = klass 
+			module.exports[typeName] = klass
 			typeClasses[typeName] = klass
-			
+
 	setTagAction: (tag, action) -> tagActions[tag.dn()] = tag: tag, action: action
 	setTokenHandler: (handler, pattern, action) -> tokenHandlers[handler] = {pattern, action}
 	setTokenPattern: (handler, pattern) -> tokenHandlers[handler].pattern = pattern
@@ -183,10 +183,10 @@ module.exports =
 
 if typeof window is "undefined"
 	fs = require "fs"
-	module.exports.readFile = (file, cb) -> 
-		fs.readFile file, "utf-8", (err, data) -> 
+	module.exports.readFile = (file, cb) ->
+		fs.readFile file, "utf-8", (err, data) ->
 			if err then throw err
 			cb parse data
 
-	module.exports.readFileSync = (file) -> 
+	module.exports.readFileSync = (file) ->
 		parse fs.readFileSync file, "utf-8"
