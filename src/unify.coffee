@@ -15,7 +15,7 @@ module.exports = (parse) -> (data, values, tokenStart = "?") ->
 			values[v]
 
 	unifyToken = (t) -> 
-		if t instanceof Symbol and "#{t}"[0] is tokenStart and (val = valExists "#{t}"[1..-1])? then return val else t
+		if t instanceof Symbol and "#{t}".charAt(0) is tokenStart and (val = valExists "#{t}"[1..-1])? then return val else t
 
 	data.walk (v, k) -> 
 		if k? then new Pair(unifyToken(k), unifyToken(v)) else unifyToken v

@@ -4,7 +4,7 @@ module.exports = (obj, path) ->
 	path = path.trim().replace(/[ ]{2,}/g, ' ').split(' ')
 	value = obj
 	for part in path
-		if part[0] is ":" 
+		if part.charAt(0) is ":"
 			part = kw part 
 			
 		if value.exists 

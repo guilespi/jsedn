@@ -20,7 +20,10 @@ lex = (string) ->
 	lines = []
 	line = 1
 	token = ''
-	for c in string
+
+	for i in [0..string.length]
+		c = string.charAt(i)
+
 		if c in ["\n", "\r"] then line++
 
 		if not in_string? and c is ";" and not escaping?
@@ -55,12 +58,12 @@ lex = (string) ->
 					in_string += escapeChar
 
 			in_string += c
-		else if c in specialChars and not escaping?
+		else if specialChars.indexOf(c) >= 0 and not escaping?
 			if token
 				list.push token
 				lines.push line 
 				token = ''
-			if c in parens
+			if parens.indexOf(c) >= 0
 				list.push c
 				lines.push line 
 		else
@@ -101,7 +104,7 @@ read = (ast) ->
 				else 
 					L.push read_ahead token, tokenIndex
 
-		else if token in ")]}"
+		else if ")]}".indexOf(token) >= 0
 			throw "unexpected #{token} at line #{tokenLines[tokenIndex]}"
 		else
 			handledToken = handleToken token

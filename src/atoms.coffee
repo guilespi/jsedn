@@ -50,15 +50,15 @@ class Symbol extends Prim
 		if word.match(@validRegex)?[0] isnt word
 			throw "provided an invalid symbol #{word}"
 
-		if word.length is 1 and word[0] isnt "/"
-			if word[0] in @invalidFirstChars 
-				throw "Invalid first character in symbol #{word[0]}"
+		if word.length is 1 and word.charAt(0) isnt "/"
+			if word.charAt(0) in @invalidFirstChars
+				throw "Invalid first character in symbol #{word.charAt(0)}"
 
-		if word[0] in ["-", "+", "."] and word[1]? and word[1].match /[0-9]/
-			throw "If first char is #{word[0]} the second char can not be numeric. You had #{word[1]}"
+		if word.charAt(0) in ["-", "+", "."] and word.charAt(1)? and word.charAt(1).match /[0-9]/
+			throw "If first char is #{word.charAt(0)} the second char can not be numeric. You had #{word.charAt(1)}"
 
-		if word[0].match /[0-9]/
-			throw "first character may not be numeric. You provided #{word[0]}"
+		if word.charAt(0).match /[0-9]/
+			throw "first character may not be numeric. You provided #{word.charAt(0)}"
 
 		true 
 
@@ -114,8 +114,8 @@ class Keyword extends Symbol
 
 	constructor: ->
 		super
-		if @val[0] isnt ":" then throw "keyword must start with a :"
-		if @val[1]? is "/" then throw "keyword can not have a slash with out a namespace"
+		if @val.charAt(0) isnt ":" then throw "keyword must start with a :"
+		if @val.charAt(1)? is "/" then throw "keyword can not have a slash with out a namespace"
 
 	jsonEncode: ->
 		Keyword: @val
